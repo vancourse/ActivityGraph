@@ -1,0 +1,82 @@
+enum ActivityType{
+EVENT,
+TASK
+}
+
+enum CompletionStatus {
+  CREATED,
+  SCHEDULED,
+  COMPLETED
+}
+entity Tag {
+ name String
+}
+entity Activity {
+	id   Long,
+	name String,
+    type ActivityType,
+    //concreteDueDate DateTime,
+    relativeDueDate RelativeDate,
+    assignee User,
+    owner User,
+    status CompletionStatus
+    //List of child activbities
+}
+entity GoalEvent {
+	concreteDueDate DateTime, //Concrete due date,
+    status	CompletionStatus
+}
+entity Checklist {
+	id   Long,
+	name String
+}
+entity RelativeDate {
+    years Integer,
+    days Integer,
+    hours Integer,
+    minutes Integer
+} 
+
+/**
+ * The Employee entity.
+ */
+entity User {
+	/**
+	* The firstname attribute.
+	*/
+	firstName String,
+	lastName String,
+	email String,
+	phoneNumber String,
+    googleAuthJson String
+}
+  
+relationship OneToOne {
+	Activity{assignee} to User,
+	Activity{owner} to User,
+    Activity{relativeDate} to RelativeDate,
+    GoalEvent{checklist} to Checklist
+}
+ 
+
+// defining multiple OneToMany relationships with comments
+relationship OneToMany {
+	Checklist{activity} to Activity,
+    GoalEvent{activity} to Activity,
+    Activity{child} to Activity,
+    Activity{tag} to Tag
+}
+  
+// Set pagination options
+paginate Activity with infinite-scroll
+paginate GoalEvent with pagination
+paginate Checklist with pagination
+paginate User with pagination
+paginate Tag with pagination 
+
+dto * with mapstruct
+
+// Set service options to all except few
+ service all with serviceImpl except RelativeDate
+// Set an angular suffix
+angularSuffix * with graphe
